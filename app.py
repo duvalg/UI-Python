@@ -2,33 +2,42 @@
 # -*- coding: utf-8 -*-
 
 import sys, traceback
-from tkinter.messagebox import *
-from tkinter.filedialog import *
+try:
+    # for Python2
+    from Tkinter import *
+    from tkMessageBox import *
+    from tkFileDialog import *
+except ImportError:
+    # for Python3
+    from tkinter import *
+    from tkinter.messagebox import *
+    from tkinter.filedialog import *
 
-# Local scripts
+# local scripts
 from sqlgestion import *
 from ui import *
 
 filename = "sample.txt"
 
-_window = Tk()
-_window.title("Databases Manager")
-_window.configure(bg="#fafafa")
+root = Tk()
+root.title("Databases Manager")
+root.configure(bg="#000")
 
-# Normalize
-_window.bind('<Button-1>', keep_flat) # bind the application to left mouse click
+# normalize
+root.bind('<Button-1>', keep_flat) # bind the application to left mouse click
 
-db = createDatabase("databases_list.db")
-if db == None: # check if database was successfully created or connected
+# database connection
+db = createDatabase("databases_list.db", "local") # "local" | "distant"
+if db == None:
     sys.exit(0)
 cursor = getCursor(db)
-if cursor == None: # check if getCursor() encountered an error
+if cursor == None:
     sys.exit(0)
 
-def displayList(liste, cursor):            # displayList: display the list of the databases
+def displayList(lb, cursor): # displayList: display the list of the databases
     i = 1
 
-    liste.delete(0, END)
+    lb.delete(0, END)
     cursor.execute('''
     SELECT name 
     FROM databases 
@@ -37,11 +46,11 @@ def displayList(liste, cursor):            # displayList: display the list of th
     ''')
     rows = cursor.fetchall()
     for row in rows:
-        liste.insert(i, row[0])
+        lb.insert(i, row[0])
         i += 1
-    liste.pack()
+    lb.pack()
 
-def insertDatabase(liste, cursor):         # insertDatabase: allow user to get the path of the databases he want to add
+def insertDatabase(lb, cursor): # insertDatabase: allow user to get the path of the databases he want to add
     filename = askopenfilename(title="Get file's path",filetypes=[('all files','.*')])
 
     if (filename):
@@ -62,13 +71,13 @@ def insertDatabase(liste, cursor):         # insertDatabase: allow user to get t
             ''')
             cursor.execute(insertDb, [(os.path.basename(filename)), (filename)])
             db.commit()
-            displayList(liste, cursor)
+            displayList(lb, cursor)
             writeAlert(alert, "Database added")
     
-def removeDatabase(liste, cursor, db): # insertDatabase: allow user to get the path of the databases he want to add
-    selectedInput = liste.get(ACTIVE)
+def removeDatabase(lb, cursor, db): # insertDatabase: allow user to get the path of the databases he want to add
+    selectedInput = lb.get(ACTIVE)
 
-    if (liste.curselection()):
+    if (lb.curselection()):
         if askyesno('Are you sure ?', 'Do you really want to delete this database ?'):
             deleteDatabase = ('''
             DELETE FROM databases 
@@ -77,19 +86,33 @@ def removeDatabase(liste, cursor, db): # insertDatabase: allow user to get the p
             cursor.execute(deleteDatabase, [(selectedInput)])
             db.commit()
             writeAlert(alert, "Database deleted")
-            displayList(liste, cursor)
+            displayList(lb, cursor)
 
 #initializing user interface
-initMenu(_window)
+initMenu(root)
 
-alert = Label(_window, fg="#282828", bg="#fafafa")
+photo = PhotoImage(file="img/logo-docaret.png")
+
+canvas = Canvas(root, width=90, height=51, bg="#000", highlightthickness=0, relief="flat")
+canvas.create_image(0, 0, anchor=NW, image=photo)
+canvas.pack(pady = (25, 0))
+
+alert = Label(root, fg="#fff", bg="#000")
 alert.config(text="Welcome to Databases Manager")
 alert.pack(pady=(25, 0), padx=50)
 
-liste = Listbox(_window, width=100)
-liste.pack(pady=25, padx=50)
+lb = Listbox(root, 
+selectmode='BROWSE', 
+relief="flat", 
+bg="#fafafa", 
+selectbackground="#fa1a42" ,
+bd = 10, 
+activestyle = "none", 
+width=100
+)
+lb.pack(pady=25, padx=50)
 
-insert = Button(_window, 
+insert = Button(root, 
 text="Insert a database", 
 height=2, 
 width=18, 
@@ -99,10 +122,10 @@ bg = "#008BD2",
 activebackground = "#005CAA", 
 relief=FLAT, 
 cursor="hand2", 
-command= lambda: insertDatabase(liste, cursor))
+command= lambda: insertDatabase(lb, cursor))
 insert.pack(padx=50)
 
-delete = Button(_window, 
+delete = Button(root, 
 text="Remove database", 
 height=2, 
 width=18, 
@@ -112,9 +135,9 @@ bg = "#fa1a42",
 activebackground = "#c22342", 
 relief=FLAT, 
 cursor="hand2", 
-command= lambda: removeDatabase(liste, cursor, db))
+command= lambda: removeDatabase(lb, cursor, db))
 delete.pack(pady=(5, 25), padx=50)
 
-displayList(liste, cursor)
+displayList(lb, cursor)
 
-_window.mainloop()
+root.mainloop()

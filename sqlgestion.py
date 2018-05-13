@@ -1,11 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sqlite3                      # needed to connect the program to a SQL database
+import sqlite3
+# import mysql.connector
 
-def createDatabase(dbName):         # createDatabase: Create or etablish connection with a database; Return the cursor
+def createDatabase(dbName, connection):         # createDatabase: Create or etablish connection with a database; Return the cursor
     try:
         db = sqlite3.connect(dbName)
+        # if (connection == "locale"):
+        #     db = sqlite3.connect(dbName)
+        # else:
+        #     host = "localhost"      # host
+        #     user = "root"           # username
+        #     password = "root"       # password
+        #     db = MySQLdb.connect(host=host,
+        #     user=user,                                  
+        #     passwd=password,                            
+        #     db=dbName)
     except:
         return None
     return db
