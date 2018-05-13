@@ -2,9 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import sys, traceback
-from tkinter import *
-from tkinter.messagebox import *
-from tkinter.filedialog import *
+try:
+    # for Python2
+    from Tkinter import *   ## notice capitalized T in Tkinter 
+    from tkMessageBox import *   ## notice capitalized T in Tkinter 
+    from tkFileDialog import *   ## notice capitalized T in Tkinter 
+except ImportError:
+    # for Python3
+    from tkinter import *   ## notice lowercase 't' in tkinter here
+    from tkinter.messagebox import *
+    from tkinter.filedialog import *
 
 # Local scripts
 from sqlgestion import *
