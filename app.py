@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import sys, traceback
 try:
     # for Python2
@@ -51,7 +52,7 @@ def displayList(lb, cursor): # displayList: display the list of the databases
     lb.pack()
 
 def insertDatabase(lb, cursor): # insertDatabase: allow user to get the path of the databases he want to add
-    filename = askopenfilename(title="Get file's path",filetypes=[('all files','.*')])
+    filename = askopenfilename(title="Get file's path",filetypes=[('all files','.*'), ('png files','*.png')])
 
     if (filename):
         checkDuplicate = ('''
@@ -91,7 +92,10 @@ def removeDatabase(lb, cursor, db): # insertDatabase: allow user to get the path
 #initializing user interface
 initMenu(root)
 
-photo = PhotoImage(file="img/logo-docaret.png")
+try:
+    photo = PhotoImage(file="img/logo-docaret.png")
+except:
+    photo = PhotoImage(file="img/logo-docaret.ppm")
 
 canvas = Canvas(root, width=90, height=51, bg="#000", highlightthickness=0, relief="flat")
 canvas.create_image(0, 0, anchor=NW, image=photo)
@@ -102,7 +106,7 @@ alert.config(text="Welcome to Databases Manager")
 alert.pack(pady=(25, 0), padx=50)
 
 lb = Listbox(root, 
-selectmode='BROWSE', 
+selectmode='SINGLE', 
 relief="flat", 
 bg="#fafafa", 
 selectbackground="#fa1a42" ,
