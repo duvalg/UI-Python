@@ -1,3 +1,5 @@
+# by : Gael Duval
+
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
@@ -18,6 +20,7 @@ except:
 # local scripts
 from sqlgestion import *
 from ui import *
+import parser
 
 filename = "sample.txt"
 
@@ -53,7 +56,10 @@ def displayList(lb, cursor): # displayList: display the list of the databases
     lb.pack()
 
 def insertDatabase(lb, cursor): # insertDatabase: allow user to get the path of the databases he want to add
-    filename = askopenfilename(title="Get file's path",filetypes=[('all files','.*'), ('png files','*.png')])
+    filename = askopenfilename(title="Get file's path",filetypes=[
+        ('all files','.*'), 
+        ('excel documents','*.xlsx')
+        ])
 
     if (filename):
         checkDuplicate = ('''
