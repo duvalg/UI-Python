@@ -3,12 +3,13 @@
 
 import os
 import sys, traceback
+
 try:
     # for Python2
     from Tkinter import *
     from tkMessageBox import *
     from tkFileDialog import *
-except ImportError:
+except:
     # for Python3
     from tkinter import *
     from tkinter.messagebox import *

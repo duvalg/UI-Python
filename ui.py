@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from Tkinter import *
+try:
+    # for Python2
+    from Tkinter import *
+except:
+    # for Python3
+    from tkinter import *
 
 global  uiAlert
 

@@ -2,23 +2,19 @@
 # -*- coding: utf-8 -*-
 
 import sqlite3
-# import mysql.connector
+import MySQLdb
 
 def createDatabase(dbName, connection):         # createDatabase: Create or etablish connection with a database; Return the cursor
-    try:
+    if (connection == "local"):
         db = sqlite3.connect(dbName)
-        # if (connection == "locale"):
-        #     db = sqlite3.connect(dbName)
-        # else:
-        #     host = "localhost"      # host
-        #     user = "root"           # username
-        #     password = "root"       # password
-        #     db = MySQLdb.connect(host=host,
-        #     user=user,                                  
-        #     passwd=password,                            
-        #     db=dbName)
-    except:
-        return None
+    else:
+        host = "192.168.64.2"      # host
+        user = "root"           # username
+        password = ""       # password
+        db = MySQLdb.connect(host=host,
+        user=user,                                  
+        passwd=password,                            
+        db=dbName)
     return db
         
 
