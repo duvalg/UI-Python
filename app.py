@@ -62,13 +62,15 @@ def insertDatabase(lb, cursor): # insertDatabase: allow user to get the path of 
         ])
 
     if (filename):
+        dbName = os.path.basename(filename)
         checkDuplicate = ('''
         SELECT (1) 
         FROM databases 
-        WHERE path = ?
+        WHERE name = ?
         LIMIT 1
         ''')
-        cursor.execute(checkDuplicate, [(filename)])
+        
+        cursor.execute(checkDuplicate, [(dbName)])
         if cursor.fetchone():
             print("error while sql request: data already exist [insertDatabase()]")
             writeAlert(alert, "Database already exist !")
@@ -77,7 +79,7 @@ def insertDatabase(lb, cursor): # insertDatabase: allow user to get the path of 
             INSERT INTO databases(name, path) 
             VALUES(?, ?)
             ''')
-            cursor.execute(insertDb, [(os.path.basename(filename)), (filename)])
+            cursor.execute(insertDb, [(dbName), (filename)])
             db.commit()
             displayList(lb, cursor)
             writeAlert(alert, "Database added")

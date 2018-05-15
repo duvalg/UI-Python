@@ -9,14 +9,16 @@ import MySQLdb
 def createDatabase(dbName, connection):         # createDatabase: Create or etablish connection with a database; Return the cursor
     if (connection == "local"):
         db = sqlite3.connect(dbName)
-    else:
-        host = "192.168.64.2"      # host
-        user = "root"           # username
-        password = ""       # password
+    elif (connection == "distant"):
+        host = "localhost"     # host
+        user = "root"          # username
+        password = ""          # password
         db = MySQLdb.connect(host=host,
         user=user,                                  
         passwd=password,                            
         db=dbName)
+    else:
+        return None
     return db
         
 
