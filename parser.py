@@ -11,7 +11,7 @@ import xlrd
 import datetime  
 import sqlite3
 
-def generateDatabase():
+def generateDatabase(dbName):
     conn = sqlite3.connect('output.db')
     c = conn.cursor()
     keys=[]
@@ -46,6 +46,7 @@ def generateDatabase():
     keys=keys+["Nom"]
     keys=keys+["Email"]
     keys=keys+["Téléphone"]
+    keys=keys+["dbId"]
 
     K=""
     for i in range(len(keys)):
@@ -53,8 +54,8 @@ def generateDatabase():
         K=K+" TEXT , "
     K=K[:-2]
     # print(K)
-    c.execute("DROP TABLE IF EXISTS offre")
-    c.execute("CREATE TABLE offre(id INTEGER PRIMARY KEY, "+K+")")
+    # c.execute("DROP TABLE IF EXISTS offre")
+    c.execute("CREATE TABLE IF NOT EXISTS offre(id INTEGER PRIMARY KEY, "+K+")")
     conn.commit()
 
     #def main():
@@ -118,7 +119,7 @@ def generateDatabase():
         return r[:-i]
 
 
-    def construct(r):
+    def construct(r, dbId):
         
         n=int((r-45)/38)
         # print("n=" + str(n))
@@ -140,9 +141,15 @@ def generateDatabase():
 
             A=["'"+i+"'" for i in L11]
             vals=' , '.join(A)
+            # valsArray = vals.split(' , ')
+            # i = 0
+            # for val in valsArray:
+            #     print(val)
+            #     i += 1
+            # print(str(i) + "datas")
             # (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
             # print(vals)
-            c.execute('insert into offre values (NULL,'+vals+')')
+            c.execute('insert into offre values (NULL,' + vals + ' , ' + dbId + ')')
             #c.execute('insert into offre values ('+vals+')')
             conn.commit()
             
@@ -152,7 +159,7 @@ def generateDatabase():
                 L22=[esp(i) for i in L2]
                 B=["'"+i+"'" for i in L22]
                 vals=' , '.join(B)
-                c.execute('insert into offre values (NULL,'+vals+')')
+                c.execute('insert into offre values (NULL,' + vals + ' , ' + dbId + ')')
                 conn.commit()
         return 
 
@@ -167,10 +174,12 @@ def generateDatabase():
     with sqlite3.connect('databases_list.db') as db:
         dbCursor = db.cursor()
 
-        dbCursor.execute('''
-            SELECT path 
-            FROM databases 
-            ''')
+        getDatabase = '''
+            SELECT path, id
+            FROM dbList 
+            WHERE name = ? 
+            '''
+        dbCursor.execute(getDatabase, [(dbName)])
         rows = dbCursor.fetchall()
 
         print("Generating database...")
@@ -179,7 +188,7 @@ def generateDatabase():
             book = xlrd.open_workbook(file_contents=open(row[0], 'rb').read())
             sheet = book.sheet_by_name('AP')
             r=sheet.nrows
-            construct(r)
+            construct(r, str(row[1]))
         print("Database generated")
 
     conn.close()

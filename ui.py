@@ -25,7 +25,7 @@ def initMenu(root):                      # initMenu: init interface's menu
     tools.add_command(label="Insert a database", command= lambda: insertDatabase(liste, cursor))
     tools.add_command(label="Remove database", command= lambda: removeDatabase(liste, cursor, db))
     tools.add_separator()
-    tools.add_command(label="Exporting database", command= generateDatabase)
+    # tools.add_command(label="Exporting database", command= generateDatabase)
     tools.add_separator()
     tools.add_command(label="Exit", command=root.quit)
     menubar.add_cascade(label="Tools", menu=tools)

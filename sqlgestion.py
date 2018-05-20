@@ -8,14 +8,14 @@ import MySQLdb
 
 def createDatabase(dbName, connection):         # createDatabase: Create or etablish connection with a database; Return the cursor
     if (connection == "local"):
-        db = sqlite3.connect(dbName)
+        db = sqlite3.connect(dbName + ".db")
     elif (connection == "distant"):
-        host = "localhost"     # host
-        user = "root"          # username
-        password = ""          # password
+        host = "localhost"              # host
+        user = "root"                   # username
+        password = "blackrose"          # password
         db = MySQLdb.connect(host=host,
-        user=user,                                  
-        passwd=password,                            
+        user=user, 
+        passwd=password, 
         db=dbName)
     else:
         return None
@@ -23,14 +23,11 @@ def createDatabase(dbName, connection):         # createDatabase: Create or etab
         
 
 def getCursor(db):
-    try:
-        _cursor = db.cursor()
-        _cursor.execute('''
-        CREATE TABLE IF NOT EXISTS databases(
-            id      INTEGER PRIMARY KEY AUTOINCREMENT,
-            name    VARCHAR(30)     NOT NULL,
-            path    VARCHAR(100)    NOT NULL);
-        ''')
-    except:
-        return None
+    _cursor = db.cursor()
+    _cursor.execute('''
+    CREATE TABLE IF NOT EXISTS dbList(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name VARCHAR(40) NOT NULL,
+        path VARCHAR(100) NOT NULL);
+    ''')
     return _cursor
