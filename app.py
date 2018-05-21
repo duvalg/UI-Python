@@ -30,21 +30,14 @@ def app():
     root.title("Databases Manager")
     root.configure(bg="#000")
 
-    # normalize
+    # NORMALIZE
     root.bind('<Button-1>', keep_flat) # bind the application to left mouse click
 
-    # database connection
-    db = createDatabase("databases_list", "local") # "local" is SQLite3 connexion | "distant" is MySQL connection
+    # DATABASE CONNEXION
+    db = createDatabase("data-manager", "local") # "local" is SQLite3 connexion | "distant" is MySQL connection
     if db == None:
         sys.exit(0)
     cursor = getCursor(db)
-    if cursor == None:
-        sys.exit(0)
-
-    dataDb = createDatabase("output", "local") # "local" is SQLite3 connexion | "distant" is MySQL connection
-    if db == None:
-        sys.exit(0)
-    dataCursor = getCursor(dataDb)
     if cursor == None:
         sys.exit(0)
 
@@ -99,7 +92,7 @@ def app():
                 displayList(lb, cursor)
                 writeAlert(alert, "Database added")
 
-                rows = getDatas(dataCursor)
+                rows = getDatas(cursor)
                 displayData(rows, tree)
 
     def removeDatabase(lb, cursor, db): # insertDatabase: allow user to get the path of the databases he want to add
@@ -121,17 +114,12 @@ def app():
                     dbId = row[0]
                     break
 
-                # DELETE DATA FROM THE ASSOCIATED DATABASE
-                outputDb = createDatabase("output", "local")
-                outputCursor = getCursor(outputDb)
-
                 deleteDatas = '''
                 DELETE FROM offre 
                 WHERE dbId = ?
                 '''
-                outputCursor.execute(deleteDatas, [(dbId)])
-                outputDb.commit()
-                outputDb.close()
+                cursor.execute(deleteDatas, [(dbId)])
+                db.commit()
 
                 # DELETE DATABASE FROM DATABASES'S LIST
                 deleteDatabase = ('''
@@ -144,58 +132,28 @@ def app():
                 
                 displayList(lb, cursor)
 
-                rows = getDatas(dataCursor)
+                rows = getDatas(cursor)
                 displayData(rows, tree)
 
-    def exploreDatabase(liste, cursor, db):
-        selectedInput = lb.get(ACTIVE)
-
-        if (lb.curselection()):
-            
-            # SELECT ID FROM DATABASE
-            selectId = ('''
-            SELECT id 
-            FROM dbList
-            WHERE name = ?
-            LIMIT 1
-            ''')
-            cursor.execute(selectId, [(selectedInput)])
-            rows = cursor.fetchall()
-            for row in rows:
-                idDb = row[0]
-            
-            # SELECT DATA FROM SELECTED DATABASE
-            selectedDb = sqlite3.connect("output.db")
-            selectedCursor = selectedDb.cursor()
-            ('''
-            SELECT * 
-            FROM offre 
-            WHERE dbId = ? 
-            ORDER BY id
-            ''')
-            rows = selectedCursor.fetchall()
-            for row in rows:
-                print(str(row[0]) + " + " + row[1])
-            selectedDb.close()
-
     def getDatas(dataCursor):
+        # SELECTING DATAS TO DISPLAY
         dataCursor.execute('''
-        SELECT Fonction, Client, Référence_WP, Numero_AP, Division, Date_envoi, Date_limite
+        SELECT fonction, client, reference_wp, numero_ap, division, date_envoi, date_limite
         FROM offre
+        ORDER BY fonction
+        DESC
         ''')
         return dataCursor.fetchall()
 
     def displayData(rows, tree):
+        # DISPLAYING DATAS
         tree.delete(*tree.get_children())
 
         for row in rows:
             tree.insert("" , 0, text=row[0], values=(row[1],row[2], row[3], row[4], row[5], row[6]))
         tree.pack()
 
-
     #INITIALIZING UI
-    initMenu(root)
-
     try:
         photo = PhotoImage(file="img/logo-docaret.png")
     except:
@@ -228,7 +186,7 @@ def app():
     tree.heading("limiteDate", text="Date limite")
 
     # GET DATA FROM DATABASE
-    rows = getDatas(dataCursor)
+    rows = getDatas(cursor)
     displayData(rows, tree)
 
     dbInfoMsg = Label(root, fg="#fff", bg="#000")
